@@ -1,6 +1,6 @@
 name: CustomRecipeGUI
 main: net.maple3142.customrecipegui.Main
-version: 0.2
+version: 0.2.1
 commands: 
     recipegui:
         description: create recipe with gui
@@ -21,6 +21,15 @@ permissions:
     customrecipegui.preview:
         description: "CustomRecipeGUI: preview recipe"
         default: op
+    customrecipegui.edit:
+        description: "CustomRecipeGUI: edit recipe"
+        default: op
     customrecipegui.list:
         description: "CustomRecipeGUI: list recipes"
+        default: op
+    customrecipegui.reloadcfg:
+        description: "CustomRecipeGUI: reload recipes"
+        default: op
+    customrecipegui.reloadcfg:
+        description: "CustomRecipeGUI: reload config.yml"
         default: op
