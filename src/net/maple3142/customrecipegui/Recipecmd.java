@@ -1,24 +1,16 @@
 package net.maple3142.customrecipegui;
 
-import static org.bukkit.ChatColor.AQUA;
-import static org.bukkit.ChatColor.GRAY;
-import static org.bukkit.ChatColor.GREEN;
-import static org.bukkit.ChatColor.RED;
-
-import java.util.ArrayList;
-import java.util.List;
-
+import com.google.gson.Gson;
+import com.google.gson.JsonElement;
 import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonElement;
+import java.util.ArrayList;
+
+import static org.bukkit.ChatColor.*;
 
 public class Recipecmd implements CommandExecutor{
 	
@@ -47,26 +39,19 @@ public class Recipecmd implements CommandExecutor{
 					}
 				}
 				if(p.getInventory().getItemInMainHand().getType()==Material.AIR) {
-					sendMsg(p,RED,"Need a item in hand to create recipe");
+					sendMsg(p,RED,"Need a item in main hand to create recipe");
 				}
 				else {
-					Inventory inv=M.getServer().createInventory(null,27,M.config.getString("GUItitle"));
-					ItemStack ok=createItem(Material.WOOL,GREEN+"ok","",5);
-					ItemStack none=createItem(Material.STAINED_GLASS_PANE,GRAY+"NONE","",0);
-					for(int i=0;i<27;i++) {
-						int im3=i/3;
-						if(!(im3==1||im3==4||im3==7))
-							inv.setItem(i, none);
-					}
-					inv.setItem(16, ok);
-					p.openInventory(inv);
+					new GUI(M,M.config.getString("GUITitle"))
+							.addRecipeTemplateGUI()
+							.show(p);
 					if(M.sess.containsKey(p.getName()))
 						M.sess.remove(p.getName());
-					M.sess.put(p.getName(), args[1]); 
+					M.sess.put(p.getName(), args[1]);
 				}
 			}
 			else if(args[0].equalsIgnoreCase("remove")&&args.length>=2) {
-				if(!p.hasPermission("customrecipegui.add")) {
+				if(!p.hasPermission("customrecipegui.remove")) {
 					sendMsg(p, RED, "No permission");
 					return true;
 				}
@@ -74,17 +59,59 @@ public class Recipecmd implements CommandExecutor{
 					CRecipe cr=new Gson().fromJson(je, CRecipe.class);
 					if(cr.name.equalsIgnoreCase(args[1])) {
 						M.rguil.store.remove(je);
-						sendMsg(p,AQUA,"Recipe Removed!");
-						M.saveRecipe();
+						sendMsg(p,GREEN,"Recipe Removed!");
 						M.getServer().resetRecipes();
 						M.loadRecipe();
-						
 						return true;
 					}
 				}
 				sendMsg(p,RED,"Recipe Not Found!");
 			}
+			else if(args[0].equalsIgnoreCase("preview")&&args.length>=2){
+				if(!p.hasPermission("customrecipegui.preview")) {
+					sendMsg(p, RED, "No permission");
+					return true;
+				}
+				for(JsonElement je:M.rguil.store) {
+					CRecipe cr=new Gson().fromJson(je, CRecipe.class);
+					if(cr.name.equalsIgnoreCase(args[1])) {
+						new GUI(M,M.config.getString("GUITitlePreview"))
+								.addRecipeTemplateGUI()
+								.addRecipeGUI(cr)
+								.show(p);
+						return true;
+					}
+				}
+				sendMsg(p,RED,"Recipe Not Found!");
+			}
+			else if(args[0].equalsIgnoreCase("list")&&args.length>=1){
+				if(!p.hasPermission("customrecipegui.list")) {
+					sendMsg(p, RED, "No permission");
+					return true;
+				}
+				ArrayList<String> list=new ArrayList<>();
+				for(JsonElement je:M.rguil.store) {
+					CRecipe cr=new Gson().fromJson(je, CRecipe.class);
+					list.add(cr.name);
+				}
+				if(list.size()>0){
+					sendMsg(p,GREEN,"Recipes list:");
+					for(String s:list){
+						sendMsg(p,GREEN," - "+s);
+					}
+				}
+				else sendMsg(p,RED,"No recipes found");
+			}
+			else if(args[0].equalsIgnoreCase("reloadcfg")&&args.length>=1){
+				if(!p.hasPermission("customrecipegui.reloadcfg")) {
+					sendMsg(p, RED, "No permission");
+					return true;
+				}
+				M.reloadConfig();
+				sendMsg(p,GREEN,"Config reloaded");
+			}
 			else sendDefault(p,cmd);
+			//TODO: "/reload": reload recipes
 		}
 		else {
 			sendMsg(sender,RED,"Only Player can execute this command");
@@ -93,20 +120,19 @@ public class Recipecmd implements CommandExecutor{
 	}
 
 	void sendDefault(CommandSender p,Command cmd) {
-		sendMsg(p,AQUA,"/"+cmd.getName()+" add <recipe name>");
-		sendMsg(p,AQUA,"/"+cmd.getName()+" add <recipe name>");
+		if(p.hasPermission("customrecipegui")){
+			sendMsg(p,GREEN,"CustomRecipeGUI Commands:");
+			sendMsg(p,AQUA,"/"+cmd.getName()+" add <recipe name>");
+			sendMsg(p,AQUA,"/"+cmd.getName()+" remove <recipe name>");
+			sendMsg(p,AQUA,"/"+cmd.getName()+" preview <recipe name>");
+			sendMsg(p,AQUA,"/"+cmd.getName()+" list");
+			sendMsg(p,AQUA,"/"+cmd.getName()+" reloadcfg");
+			return;
+		}
+		sendMsg(p, RED, "No permission");
 	}
 	void sendMsg(CommandSender p,org.bukkit.ChatColor c,String msg) {
 		p.sendMessage(c+msg);
 	}
-	ItemStack createItem(Material m,String name,String lore,int dmg) {
-		ItemStack item=new ItemStack(m,1,(byte)dmg);
-		ItemMeta meta=item.getItemMeta();
-		meta.setDisplayName(name);
-		List<String> lr=new ArrayList<String>();
-		lr.add(lore);
-		meta.setLore(lr);
-		item.setItemMeta(meta);
-		return item;
-	}
+
 }

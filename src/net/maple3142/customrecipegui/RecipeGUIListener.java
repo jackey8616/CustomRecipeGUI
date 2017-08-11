@@ -1,9 +1,7 @@
 package net.maple3142.customrecipegui;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-
+import com.google.gson.Gson;
+import com.google.gson.JsonElement;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
@@ -15,14 +13,15 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.ShapedRecipe;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonElement;
+import java.util.HashMap;
+import java.util.Map;
 
 public class RecipeGUIListener implements Listener {
 	Main M;
-	public ArrayList<JsonElement> store=new ArrayList<>();
-	public RecipeGUIListener(Main M) {
+	public JsonFileArrayList<JsonElement> store;
+	public RecipeGUIListener(Main M,String file) {
 		this.M=M;
+		this.store=new JsonFileArrayList<>(file);
 	}
 	
 	@EventHandler
@@ -30,7 +29,8 @@ public class RecipeGUIListener implements Listener {
 		Player p=(Player) e.getWhoClicked();
 		ItemStack click=e.getCurrentItem();
 		Inventory inv=e.getInventory();
-		if(inv.getName()==M.config.getString("GUItitle")) {
+		if(click==null)return;
+		if(inv.getName()==M.config.getString("GUITitle")) {
 			Material type=click.getType();
 			if(type==Material.STAINED_GLASS_PANE)e.setCancelled(true);
 			else if(type==Material.WOOL){
@@ -39,20 +39,20 @@ public class RecipeGUIListener implements Listener {
 				Map<Material,Character> map=new HashMap<>();
 				Map<Character,Material> umap=new HashMap<>();
 				int cc=0,s=3;
-				for(int l=0;l<=20;l+=10) {
+				for(int l=0;l<=2;l++) {
 					for(int i=s;i<=s+2;i++) {
-						int idx=l+i;
+						int idx=l*10+i;
 						ItemStack item=inv.getItem(idx);
 						if(item==null) {
-							shape[l/10]+=" ";
+							shape[l]+=" ";
 						}
 						else if(!map.containsKey(item.getType())) {
 							umap.put(chars[cc],item.getType());
 							map.put(item.getType(),chars[cc++]);
-							shape[l/10]+=map.get(item.getType());
+							shape[l]+=map.get(item.getType());
 						}
 						else {
-							shape[l/10]+=map.get(item.getType());
+							shape[l]+=map.get(item.getType());
 						}
 					}
 					s--;
@@ -75,6 +75,9 @@ public class RecipeGUIListener implements Listener {
 				}
 				p.closeInventory();
 			}
+		}
+		else if(inv.getName()==M.config.getString("GUITitlePreview")){
+			e.setCancelled(true);
 		}
 	}
 	void sendMsg(CommandSender p,org.bukkit.ChatColor c,String msg) {
