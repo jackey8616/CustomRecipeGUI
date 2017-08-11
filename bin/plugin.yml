@@ -1,6 +1,6 @@
 name: CustomRecipeGUI
 main: net.maple3142.customrecipegui.Main
-version: 1.0
+version: 0.2
 commands: 
     recipegui:
         description: create recipe with gui
@@ -17,4 +17,10 @@ permissions:
         default: op
     customrecipegui.remove:
         description: "CustomRecipeGUI: remove recipe"
+        default: op
+    customrecipegui.preview:
+        description: "CustomRecipeGUI: preview recipe"
+        default: op
+    customrecipegui.list:
+        description: "CustomRecipeGUI: list recipes"
         default: op
