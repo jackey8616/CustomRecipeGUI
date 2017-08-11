@@ -21,6 +21,15 @@ permissions:
     customrecipegui.preview:
         description: "CustomRecipeGUI: preview recipe"
         default: op
+    customrecipegui.edit:
+        description: "CustomRecipeGUI: edit recipe"
+        default: op
     customrecipegui.list:
         description: "CustomRecipeGUI: list recipes"
+        default: op
+    customrecipegui.reloadcfg:
+        description: "CustomRecipeGUI: reload recipes"
+        default: op
+    customrecipegui.reloadcfg:
+        description: "CustomRecipeGUI: reload config.yml"
         default: op

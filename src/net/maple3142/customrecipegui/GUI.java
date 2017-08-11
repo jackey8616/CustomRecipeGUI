@@ -2,6 +2,8 @@ package net.maple3142.customrecipegui;
 
 import com.sun.istack.internal.NotNull;
 import com.sun.istack.internal.Nullable;
+import net.maple3142.customrecipegui.dataclasses.CIngredient;
+import net.maple3142.customrecipegui.dataclasses.CRecipe;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
@@ -19,57 +21,63 @@ import static org.bukkit.ChatColor.GREEN;
 public class GUI {
 	Inventory inv;
 	Main M;
-	GUI(Main M,String name){
-		this.M=M;
-		inv=M.getServer().createInventory(null,27,name);
+
+	public GUI(Main M, String name) {
+		this.M = M;
+		inv = M.getServer().createInventory(null, 27, name);
 	}
-	GUI show(Player p){
+
+	public GUI show(Player p) {
 		p.openInventory(inv);
 		return this;
 	}
-	GUI addRecipeTemplateGUI(){
-		ItemStack ok=createItem(Material.WOOL,GREEN+"ok","",5);
-		ItemStack none=createItem(Material.STAINED_GLASS_PANE,GRAY+"NONE","",0);
-		for(int i=0;i<27;i++) {
-			int im3=i/3;
-			if(!(im3==1||im3==4||im3==7))
+
+	public GUI addRecipeTemplateGUI() {
+		ItemStack ok = createItem(Material.WOOL, GREEN + "OK", "", 5);
+		ItemStack none = createItem(Material.STAINED_GLASS_PANE, GRAY + "NONE", "", 0);
+		for (int i = 0; i < 27; i++) {
+			int im3 = i / 3;
+			if (!(im3 == 1 || im3 == 4 || im3 == 7))
 				inv.setItem(i, none);
 		}
-		inv.setItem(16, ok);
+		setRightButton(ok);
 		return this;
 	}
-	GUI addRecipeGUI(CRecipe rc){
-		Map<Character,Material> map=new HashMap<>();
-		map.put(' ',Material.AIR);
-		for(CIngredient ci:rc.ingredient){
-			map.put(ci.ch,Material.getMaterial(ci.material));
+
+	public GUI addRecipeGUI(CRecipe rc) {
+		Map<Character, Material> map = new HashMap<>();
+		map.put(' ', Material.AIR);
+		for (CIngredient ci : rc.ingredient) {
+			map.put(ci.ch, Material.getMaterial(ci.material));
 		}
-		int s=3;
-		for(int l=0;l<=2;l++){
-			for(int i=s;i<=s+2;i++){
-				int idx=l*10+i;
-				char ch=rc.shape[l].charAt(i-s);
-				if(ch!=' '){
-					Material m=map.get(ch);
-					ItemStack item=createItem(m,null,null,0);
-					inv.setItem(idx,item);
-				}
+		int s = 3;
+		for (int l = 0; l <= 2; l++) {
+			for (int i = s; i <= s + 2; i++) {
+				int idx = l * 10 + i;
+				char ch = rc.shape[l].charAt(i - s);
+				if(ch==' ')continue;
+				Material m = map.get(ch);
+				ItemStack item = createItem(m, null, null, 0);
+				inv.setItem(idx, item);
 			}
 			s--;
 		}
-		ItemStack result=ItemStack.deserialize(rc.result);
-		inv.setItem(16,result);
+		return this;
+	}
+
+	public GUI setRightButton(ItemStack item){
+		inv.setItem(16,item);
 		return this;
 	}
 	ItemStack createItem(@NotNull Material m,
 	                     @Nullable String name,
 	                     @Nullable String lore,
 	                     @NotNull int dmg) {
-		ItemStack item=new ItemStack(m,1,(byte)dmg);
-		ItemMeta meta=item.getItemMeta();
-		if(name!=null)meta.setDisplayName(name);
-		List<String> lr=new ArrayList<String>();
-		if(lore!=null)lr.add(lore);
+		ItemStack item = new ItemStack(m, 1, (byte) dmg);
+		ItemMeta meta = item.getItemMeta();
+		if (name != null) meta.setDisplayName(name);
+		List<String> lr = new ArrayList<String>();
+		if (lore != null) lr.add(lore);
 		meta.setLore(lr);
 		item.setItemMeta(meta);
 		return item;
