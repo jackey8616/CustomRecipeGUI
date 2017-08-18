@@ -22,10 +22,7 @@ import java.nio.file.Files;
 import java.nio.file.LinkOption;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
+import java.util.*;
 
 public class Main extends JavaPlugin {
 
@@ -37,7 +34,6 @@ public class Main extends JavaPlugin {
 
 	@Override
 	public void onEnable() {
-		System.out.println("OnEnable");
 		recipejson = this.getDataFolder().getAbsolutePath() + "/recipe.json";
 		rguil = new RecipeGUIListener(this, recipejson);
 		Path pr = Paths.get(recipejson);
@@ -64,19 +60,16 @@ public class Main extends JavaPlugin {
 
 	@Override
 	public void onDisable() {
-		System.out.println("OnDisable");
 		super.onDisable();
 	}
 
 	@Override
 	public void reloadConfig() {
-		System.out.println("OnReloadConfig");
 		super.reloadConfig();
 		this.config = getConfig();
 	}
 
 	public void loadRecipe() {
-		System.out.println("OnReloadRecipe");
 		try {
 			rguil.store = new JsonFileArrayList<>(recipejson);
 			JsonReader reader = new JsonReader(new FileReader(recipejson));
@@ -98,6 +91,7 @@ public class Main extends JavaPlugin {
 	}
 
 	// Copy from 'org.inventory.ItemStack#deserialize'
+	// And thanks for jackey8616
 	public ItemStack deserialize(Map<String, Object> args) {
 		Material type = Material.getMaterial((String)args.get("type"));
 		short damage = 0;
@@ -128,6 +122,7 @@ public class Main extends JavaPlugin {
 				}
 			}
 		} else if (args.containsKey("meta")) {
+			ItemMeta meta=result.getItemMeta();
 			// It's actually here.
 			LinkedTreeMap<String, Object> a = (LinkedTreeMap<String, Object>) args.get("meta");
 			Object innerRaw = a.get("enchantments");
@@ -144,16 +139,33 @@ public class Main extends JavaPlugin {
 					//if (enchantment != null && entry.getValue() instanceof Integer) {
 					if (enchantment != null && entry.getValue() instanceof Number) {
 						//result.addUnsafeEnchantment(enchantment, ((Integer)entry.getValue()).intValue());
-						result.addUnsafeEnchantment(enchantment, ((Number) entry.getValue()).intValue());
+						//result.addUnsafeEnchantment(enchantment, ((Number) entry.getValue()).intValue());
+						meta.addEnchant(enchantment,((Number) entry.getValue()).intValue(),true);
 					}
 				}
 			}
 
-			// Origin code
+			innerRaw=a.get("displayName");
+			if(innerRaw instanceof String){
+				meta.setDisplayName((String)innerRaw);
+			}
+
+			innerRaw=a.get("amount");
+			if(innerRaw instanceof Integer){
+				result.setAmount((Integer)innerRaw);
+			}
+
+			innerRaw=a.get("lore");
+			if(innerRaw instanceof ArrayList){
+				List lore=new ArrayList<String>((ArrayList)innerRaw);
+				meta.setLore(lore);
+			}
+
 			raw = args.get("meta");
 			if (raw instanceof ItemMeta) {
-				result.setItemMeta((ItemMeta)raw);
+				meta=(ItemMeta)raw;
 			}
+			result.setItemMeta(meta);
 		}
 
 		return result;

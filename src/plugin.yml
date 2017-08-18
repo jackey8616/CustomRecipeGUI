@@ -30,6 +30,6 @@ permissions:
     customrecipegui.reloadcfg:
         description: "CustomRecipeGUI: reload recipes"
         default: op
-    customrecipegui.reloadcfg:
+    customrecipegui.reload:
         description: "CustomRecipeGUI: reload config.yml"
         default: op

@@ -19,10 +19,9 @@ public class Preview extends SubCommand {
 	@Override
 	public boolean exec(Player p, String[] args) {
 		for (JsonElement je : M.rguil.store) {
-			CRecipe cr = new Gson().fromJson(je, new TypeToken<CRecipe>() {
-			}.getType());
+			CRecipe cr = new Gson().fromJson(je, new TypeToken<CRecipe>() {}.getType());
 			if (cr.name.equalsIgnoreCase(args[0])) {
-				ItemStack result = ItemStack.deserialize(cr.result);
+				ItemStack result = M.deserialize(cr.result);
 				new GUI(M, M.config.getString("GUITitlePreview"))
 						.addRecipeTemplateGUI()
 						.addRecipeGUI(cr)
