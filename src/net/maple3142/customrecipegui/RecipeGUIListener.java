@@ -2,8 +2,6 @@ package net.maple3142.customrecipegui;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.reflect.TypeToken;
 import net.maple3142.customrecipegui.cmd.Remove;
 import net.maple3142.customrecipegui.dataclasses.CIngredient;
 import net.maple3142.customrecipegui.dataclasses.CRecipe;

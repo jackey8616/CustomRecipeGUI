@@ -1,6 +1,5 @@
 package net.maple3142.customrecipegui.cmd;
 
-import net.maple3142.customrecipegui.JsonFileArrayList;
 import net.maple3142.customrecipegui.Main;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
